@@ -18,9 +18,6 @@ class Usuarios
     #[ORM\Column(length: 255)]
     private ?string $nombre = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $email = null;
-
     #[ORM\OneToMany(mappedBy: 'nombre', targetEntity: Mensajes::class, orphanRemoval: true)]
     private Collection $mensajes;
 
@@ -42,18 +39,6 @@ class Usuarios
     public function setNombre(string $nombre): static
     {
         $this->nombre = $nombre;
-
-        return $this;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
 
         return $this;
     }

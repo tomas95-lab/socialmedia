@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chat{% endblock %}
+
+{% block body %}
+<div class="flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-md shadow-md w-96">
+        <div id="chat" class="h-64 overflow-y-auto mb-4">
+            <!-- Aquí se mostrarán los mensajes -->
+            <div class="mb-2">
+                <strong>{{nombre}}</strong> {{contenido}}
+            </div>
+            <div class="mb-2">
+                <strong>Usuario2:</strong> ¡Hola! Estoy bien, gracias.
+            </div>
+            <!-- Agrega más mensajes aquí -->
+        </div>
+
+        <!-- Formulario para enviar mensajes -->
+        <form id="chatForm" action='{{path("app_chat")}}' method="post">
+            <input type="text" name="message" id="message" class="w-full p-2 border rounded-md mb-2" placeholder="Escribe tu mensaje...">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Enviar</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
