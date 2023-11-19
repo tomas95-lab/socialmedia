@@ -18,19 +18,20 @@ class MainController extends AbstractController
     public function index(EntityManagerInterface $em, Request $request)
     {
         $session = $request->getSession();
-        $nombre = $session->get('nombre');
+
+        // Recupera el objeto de usuario de la sesión
+        $usuario = $session->get('usuario');
+        $nombre = $usuario ? $usuario->getNombre() : null;
+
+        // Recupera el usuario usando el objeto almacenado en la sesión
         $usuario = $em->getRepository('App\Entity\Usuarios')->findOneBy(['nombre' => $nombre]);
 
         $usuarioId = $usuario ? $usuario->getId() : null;
 
-        if ($usuarioId !== null) {
-            echo "<pre>";
-            var_dump($usuarioId);
-            die();
-        }
         $params = $request->request->all();
 
         $contenido = null;
+        $mensajesTodos = null;
         $fecha = null;
         if ($params && $usuarioId) {
             $mensajes = new Mensajes();
@@ -38,24 +39,29 @@ class MainController extends AbstractController
             $fechaActual = new \DateTime();
             $fecha = $mensajes->setFecha($fechaActual);
 
-            // Utiliza la entidad completa de Usuarios
-            $mensajes->setNombre($usuario);
+            // Utiliza el objeto de Usuarios almacenado en la sesión
+            $mensajeNombre = $mensajes->setNombre($usuario);
 
             $em->persist($contenido);
             $em->persist($fecha);
             $em->persist($mensajes);
+            $em->persist($mensajeNombre);
             $em->flush();
         }
         if ($contenido) {
             $contenido = $mensajes->getContenido();
             $fecha = $mensajes->getFecha();
         }
+
+        // Recupera todos los mensajes para mostrarlos en la vista
+        $mensajesTodos = $em->getRepository('App\Entity\Mensajes')->findAll();
+
         return $this->render('main/chat.html.twig', [
-            'nombre' => $nombre,
-            'contenido' => $contenido,
-            'fecha' => $fecha,
+            'usuarioAct' => $nombre,
+            'mensajes' => $mensajesTodos
         ]);
     }
+
     #[Route('/login', name: 'app_formulario')]
     public function formulario(EntityManagerInterface $em, Request $request, SessionInterface $session)
     {
@@ -67,7 +73,12 @@ class MainController extends AbstractController
             $nombre = $entidad->setNombre($params['nombre']);
             $em->persist($nombre);
             $em->flush();
-            $session->set('nombre', $entidad->getNombre());
+
+            // Guarda el objeto de usuario en la sesión
+            $session->set('usuario', $entidad);
+
+            $em->persist($nombre);
+            $em->flush();
 
             return $this->redirectToRoute('app_chat');
         }

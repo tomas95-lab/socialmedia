@@ -2,17 +2,36 @@
 
 {% block title %}Chat{% endblock %}
 
+
+{% block javascripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var chatDiv = $('#chat');
+            chatDiv.scrollTop(chatDiv[0].scrollHeight);  // Desplaza hasta la parte inferior
+
+            // Escucha el envío del formulario y ajusta el desplazamiento después de agregar un nuevo mensaje
+            $('#chatForm').submit(function() {
+                setTimeout(function() {
+                    chatDiv.scrollTop(chatDiv[0].scrollHeight);
+                }, 0);
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block body %}
 <div class="flex items-center justify-center h-screen">
-    <div class="bg-white p-8 rounded-md shadow-md w-96">
+    <div class="bg-white divide-y divide-gray-200 p-8 rounded-md shadow-md w-96">
+       Tu Usuaurio: <strong class="">{{usuarioAct}}</strong>
         <div id="chat" class="h-64 overflow-y-auto mb-4">
-            <!-- Aquí se mostrarán los mensajes -->
+        {% for mensaje in mensajes %}
             <div class="mb-2">
-                <strong>{{nombre}}</strong> {{contenido}}
+            <strong>{{ mensaje.getNombre().getNombre()}}</strong>
+            <p>{{ mensaje.getContenido() }}  <span class="text-xs">{{ mensaje.getFecha() | date('Y-m-d') }}</span></p>
+           
             </div>
-            <div class="mb-2">
-                <strong>Usuario2:</strong> ¡Hola! Estoy bien, gracias.
-            </div>
+        {% endfor %}
             <!-- Agrega más mensajes aquí -->
         </div>
 
